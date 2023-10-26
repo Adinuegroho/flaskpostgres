@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import psycopg2
 import psycopg2.extras
 
@@ -18,7 +18,8 @@ def index():
     s = "SELECT * FROM students"
     cur.execute(s)
     list_users = cur.fetchall()
-    return render_template('index.html', list_users = list_users)
+    email = session.get('email', '')
+    return render_template('index.html', list_users=list_users, email=email)
 
 @app.route('/add_student', methods=['POST'])
 def add_student():
@@ -27,9 +28,16 @@ def add_student():
         fname = request.form['fname']
         lname = request.form['lname']
         email = request.form['email']
+    if not fname or not email:
+        flash('Semua input harus diisi!')
+        session['email'] = email
+        return redirect(url_for('index'))
+    else:
         cur.execute("INSERT INTO students (fname, lname, email) VALUES (%s,%s,%s)", (fname, lname, email))
         conn.commit()
         flash('Student Added Successfully')
+        session.pop('nama', None)
+        session.pop('email', None)
         return redirect(url_for('index'))
 
 
@@ -50,6 +58,11 @@ def update_student(id):
         fname = request.form['fname']
         lname = request.form['lname']
         email = request.form['email']
+        #
+        # if not fname or not email:
+        #     flash('Semua input harus diisi!')
+        #     session['email'] = email
+        #     return redirect(url_for('index'))
 
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute("""
