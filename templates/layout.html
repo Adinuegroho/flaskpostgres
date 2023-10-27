@@ -60,6 +60,13 @@
              location.reload(true);
         }
 
+        function clearFlash() {
+            var notification = document.querySelector('.notification');
+            if (notification) {
+                notification.parentNode.removeChild(notification);
+            }
+        }
+
     </script>
 
 </body>

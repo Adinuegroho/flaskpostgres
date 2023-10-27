@@ -58,23 +58,24 @@ def update_student(id):
         fname = request.form['fname']
         lname = request.form['lname']
         email = request.form['email']
-        #
-        # if not fname or not email:
-        #     flash('Semua input harus diisi!')
-        #     session['email'] = email
-        #     return redirect(url_for('index'))
 
-        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cur.execute("""
-            UPDATE students
-            SET fname = %s,
-                lname = %s,
-                email = %s
-            WHERE id = %s
-        """, (fname, lname, email, id))
-        flash('Student Updated Successfully')
-        conn.commit()
-        return redirect(url_for('index'))
+        if not fname or not email:
+            flash('Semua input harus diisi!')
+            session['email'] = email
+            return redirect(url_for('index'))
+        else:
+            cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute("""
+                        UPDATE students
+                        SET fname = %s,
+                            lname = %s,
+                            email = %s
+                        WHERE id = %s
+                    """, (fname, lname, email, id))
+            flash('Student Updated Successfully')
+            conn.commit()
+            return redirect(url_for('index'))
+
 
 @app.route('/delete/<string:id>', methods=['POST', 'GET'])
 def delete_student(id):
